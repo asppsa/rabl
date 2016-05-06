@@ -9,7 +9,7 @@ module Rabl
 
       Rabl.source_cache(file, view_paths) do
         file_path = \
-          if defined?(Padrino) && context_scope.respond_to?(:settings) && context_scope.respond_to?(:resolve_template)
+          if defined?(Padrino) && context_scope.is_a?(Padrino::Application)
             fetch_padrino_source(file, options)
           elsif defined?(Rails) && context_scope.respond_to?(:view_paths)
             _view_paths = view_paths + Array(context_scope.view_paths.to_a)
@@ -34,7 +34,7 @@ module Rabl
         view_path = Array(options[:view_path] || context_scope.settings.views)
 
         # use Padrino's own template resolution mechanism
-        file_path, _ = context_scope.instance_eval { resolve_template(file) }
+        file_path, _ = context_scope.send(:resolve_template, file)
 
         # Padrino chops the extension, stitch it back on
         File.join(view_path.first.to_s, (file_path.to_s + ".rabl"))
